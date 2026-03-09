@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Braille4U — Технологии независимости</title>
+    <style>
+      /* Базовые настройки в стиле Apple */
+      :root {
+        --text-primary: #1d1d1f;
+        --text-secondary: #86868b;
+        --accent: #e02424; /* Красный акцент из бренда */
+        --glass: rgba(
+          255,
+          255,
+          255,
+          0.85
+        ); /* Полупрозрачная подложка для читаемости */
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "SF Pro Display", Roboto,
+          Helvetica, sans-serif;
+        color: var(--text-primary);
+        line-height: 1.5;
+        letter-spacing: -0.02em;
+        overflow-x: hidden;
+
+        /* ФОН ВСЕГО САЙТА */
+        background-image: url("render.png"); /* Основной рендер */
+        background-attachment: fixed; /* Фон не движется при скролле */
+        background-size: cover; /* Закрывает весь экран */
+        background-position: center; /* Центрирован */
+        background-repeat: no-repeat;
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      /* Навигация (Стекломорфизм) */
+      nav {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        height: 54px;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: saturate(180%) blur(20px);
+        -webkit-backdrop-filter: saturate(180%) blur(20px);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+      }
+
+      .nav-inner {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 20px;
+      }
+
+      .nav-brand {
+        font-weight: 600;
+        font-size: 19px;
+        color: var(--text-primary);
+        text-decoration: none;
+      }
+
+      .nav-links a {
+        font-size: 13px;
+        color: var(--text-primary);
+        text-decoration: none;
+        margin-left: 25px;
+        opacity: 0.8;
+        transition: opacity 0.3s;
+      }
+
+      .nav-links a:hover {
+        opacity: 1;
+      }
+
+      /* Стилизация блоков контента для читаемости поверх фона */
+      .content-block {
+        background-color: var(--glass);
+        border-radius: 30px;
+        padding: 60px;
+        margin-bottom: 40px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      }
+
+      /* Главный экран */
+      .hero {
+        padding: 150px 0 60px;
+        text-align: center;
+      }
+
+      .braille-text {
+        font-size: 32px;
+        color: var(--accent);
+        letter-spacing: 10px;
+        margin-bottom: 20px;
+        font-weight: bold;
+        /* Тень для читаемости на пестром фоне */
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .hero h1 {
+        font-size: 64px;
+        line-height: 1.1;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        margin-bottom: 20px;
+        color: #fff; /* Белый текст для контраста с фоном */
+        text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      }
+
+      .hero p {
+        font-size: 24px;
+        color: #fff;
+        max-width: 700px;
+        margin: 0 auto 40px;
+        text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 16px 35px;
+        border-radius: 98px;
+        font-size: 17px;
+        font-weight: 600;
+        text-decoration: none;
+        background-color: var(--text-primary);
+        color: #fff;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+
+      .btn:hover {
+        transform: scale(1.02);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Секция характеристик (Grid) */
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        padding: 40px 0;
+      }
+
+      .feature-card {
+        background-color: var(--glass);
+        padding: 40px;
+        border-radius: 24px;
+        border: 1px solid rgba(0, 0, 0, 0.03);
+      }
+
+      .feature-card h3 {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 15px;
+      }
+
+      .feature-card p {
+        font-size: 17px;
+        color: var(--text-secondary);
+      }
+
+      /* Секции с картинками (Split layout) */
+      .split-section {
+        display: flex;
+        align-items: center;
+        gap: 50px;
+        margin-bottom: 40px;
+      }
+
+      .split-section.reverse {
+        flex-direction: row-reverse;
+      }
+
+      .split-text {
+        flex: 1;
+      }
+
+      .split-text h2 {
+        font-size: 36px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        letter-spacing: -0.01em;
+      }
+
+      .split-text p {
+        font-size: 19px;
+        color: var(--text-secondary);
+        margin-bottom: 15px;
+      }
+
+      .split-image {
+        flex: 1;
+        text-align: center;
+      }
+
+      .split-image img {
+        max-width: 100%;
+        border-radius: 20px;
+        /* Убираем смешивание, чтобы картинки были четкими поверх подложки */
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      }
+
+      /* Призыв к действию (CTA) */
+      .cta {
+        text-align: center;
+        padding: 80px 0;
+      }
+
+      footer {
+        text-align: center;
+        padding: 30px;
+        font-size: 13px;
+        color: var(--text-secondary);
+        background-color: rgba(255, 255, 255, 0.9);
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+      }
+
+      /* Анимации появления */
+      .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition:
+          opacity 0.8s ease-out,
+          transform 0.8s ease-out;
+      }
+
+      .reveal.active {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Мобильная адаптация */
+      @media (max-width: 768px) {
+        .hero h1 {
+          font-size: 40px;
+        }
+        .hero p {
+          font-size: 18px;
+        }
+        .content-block {
+          padding: 30px;
+        }
+        .split-section,
+        .split-section.reverse {
+          flex-direction: column;
+          text-align: center;
+          gap: 30px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="nav-inner container">
+        <a href="#" class="nav-brand">Braille4U</a>
+        <div class="nav-links">
+          <a href="https://t.me/braille4u" target="_blank">Канал</a>
+          <a href="https://t.me/braille4u_bot" target="_blank">Бот</a>
+        </div>
+      </div>
+    </nav>
+
+    <header class="hero container reveal">
+      <div class="braille-text" aria-hidden="true">⠃⠗⠁⠯⠇⠾⠀⠙⠇⠫⠀⠺⠎⠑⠓⠖</div>
+      <h1>Коммуникатор нового поколения</h1>
+      <p>
+        Инновационное устройство для тактильного общения, разработанное для
+        полной независимости людей с нарушениями зрения и слуха.
+      </p>
+      <a href="https://t.me/braille4u_bot" class="btn" target="_blank"
+        >Предзаказ в Telegram</a
+      >
+    </header>
+
+    <main class="container">
+      <section
+        class="content-block reveal feature-card"
+        style="text-align: center"
+      >
+        <h2 style="font-size: 32px; margin-bottom: 20px">Доступная инклюзия</h2>
+        <p style="font-size: 19px; max-width: 800px; margin: 0 auto">
+          Современный рынок ассистивных технологий перенасыщен дорогими
+          импортными решениями. Стоимость аналогов достигает сотен тысяч рублей,
+          оставляя 95% нуждающихся без поддержки. Проект Braille4U призван
+          сделать технологии общения доступными каждому.
+        </p>
+      </section>
+
+      <section class="content-block split-section reveal">
+        <div class="split-text">
+          <h2>Эргономика и скорость</h2>
+          <p>
+            Устройство имеет уникальную модульную архитектуру: центральную базу
+            и две независимые беспроводные рукоятки. Это позволяет кистям
+            находиться в естественном, расслабленном положении при работе.
+          </p>
+          <p>
+            Использование принципа ввода «шести пальцев» увеличивает скорость
+            набора текста в 1.5–2 раза по сравнению с существующими монолитными
+            устройствами.
+          </p>
+        </div>
+        <div class="split-image">
+          <img
+            src="blueprint.png"
+            alt="Чертеж модульной конструкции Braille4U"
+          />
+        </div>
+      </section>
+
+      <section class="content-block split-section reverse reveal">
+        <div class="split-text">
+          <h2>Автономность и тактильный отклик</h2>
+          <p>
+            Разработанная электроника на базе современных драйверов и
+            LRA-вибромоторов обеспечивает более 120 настраиваемых паттернов
+            вибрации для передачи информации.
+          </p>
+          <p>
+            Встроенный аккумулятор емкостью 3000 mAh и алгоритм динамического
+            распределения энергии обеспечивают недели автономной работы,
+            превосходя аналоги в десятки раз.
+          </p>
+        </div>
+        <div class="split-image">
+          <img src="pcb.png" alt="Печатная плата коммуникатора" />
+        </div>
+      </section>
+
+      <section class="content-block split-section reveal">
+        <div class="split-text">
+          <h2>Технологическое превосходство</h2>
+          <p>
+            Мы используем передовые компоненты для создания надежного и быстрого
+            интерфейса связи. Каждая деталь спроектирована с учетом жестких
+            требований к энергоэффективности и скорости отклика.
+          </p>
+        </div>
+        <div class="split-image">
+          <img src="pcb1.png" alt="Дополнительное изображение электроники" />
+        </div>
+      </section>
+
+      <section class="features-grid container reveal">
+        <div class="feature-card">
+          <h3>HID-контроллер</h3>
+          <p>
+            Полноценное управление смартфоном или ПК через беспроводной
+            интерфейс связи.
+          </p>
+        </div>
+        <div class="feature-card">
+          <h3>Обучение</h3>
+          <p>Встроенное приложение для пошагового освоения шрифта Брайля.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Экономика</h3>
+          <p>
+            Целевая розничная цена ~15 000 руб., что в 7-10 раз дешевле
+            импортных аналогов.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <section class="cta container reveal">
+      <div class="content-block">
+        <h2 style="font-size: 36px; margin-bottom: 20px">Свяжитесь с нами</h2>
+        <p
+          style="
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 30px;
+          "
+        >
+          По вопросам предзаказа, тестирования, сотрудничества или любым другим
+          вопросам обращайтесь к нашему Telegram-боту.
+        </p>
+        <a href="https://t.me/braille4u_bot" class="btn" target="_blank"
+          >Написать @braille4u_bot</a
+        >
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <p>2026 Проект Braille4U. Технологии тактильного взаимодействия.</p>
+      </div>
+    </footer>
+
+    <script>
+      // Плавное появление элементов при скролле
+      function reveal() {
+        var reveals = document.querySelectorAll(".reveal");
+        for (var i = 0; i < reveals.length; i++) {
+          var windowHeight = window.innerHeight;
+          var elementTop = reveals[i].getBoundingClientRect().top;
+          if (elementTop < windowHeight - 100) {
+            reveals[i].classList.add("active");
+          }
+        }
+      }
+      window.addEventListener("scroll", reveal);
+      // Запуск при загрузке
+      setTimeout(reveal, 100);
+    </script>
+  </body>
+</html>
